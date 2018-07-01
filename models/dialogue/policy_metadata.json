@@ -1,0 +1,67 @@
+{
+  "action_fingerprints": {
+    "action_genre": {
+      "slots": [
+        "movie.genre"
+      ]
+    }, 
+    "action_listen": {
+      "slots": [
+        "movie.name"
+      ]
+    }, 
+    "action_duration": {
+      "slots": [
+        "movie.duration"
+      ]
+    }, 
+    "utter_goodbye": {
+      "slots": []
+    }, 
+    "action_country": {
+      "slots": [
+        "movie.release_region"
+      ]
+    }, 
+    "action_score": {
+      "slots": [
+        "movie.star_rating"
+      ]
+    }, 
+    "action_director": {
+      "slots": [
+        "director.name"
+      ]
+    }, 
+    "action_language": {
+      "slots": [
+        "movie.language"
+      ]
+    }, 
+    "action_actor": {
+      "slots": [
+        "actor.name"
+      ]
+    }, 
+    "action_budget": {
+      "slots": [
+        "movie.budget"
+      ]
+    }, 
+    "action_year": {
+      "slots": [
+        "movie.duration"
+      ]
+    }
+  }, 
+  "policy_names": [
+    "rasa_core.policies.memoization.MemoizationPolicy", 
+    "rasa_core.policies.keras_policy.KerasPolicy"
+  ], 
+  "ensemble_name": "rasa_core.policies.ensemble.SimplePolicyEnsemble", 
+  "max_histories": [
+    3, 
+    5
+  ], 
+  "rasa_core": "0.9.3"
+}
