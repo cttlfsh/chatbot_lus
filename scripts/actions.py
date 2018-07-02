@@ -112,8 +112,8 @@ class ActionDirector(Action):
 		if movie is None:
 			dispatcher.utter_message(error_messages())
 		else:
-			movie_db = DBManager(LINK_TO_DB)
-			director = movie_db.get_director(movie)
+			movie_db = DBManager()
+			movie_db.get_director(movie)
 
 			if director is None:
 				dispatcher.utter_message(error_messages())
@@ -222,7 +222,7 @@ class ActionBudget(Action):
 		if movie is None:
 			dispatcher.utter_message(error_messages())
 		else:
-			movie_db = DBManager(LINK_TO_DB)
+			#movie_db = DBManager(LINK_TO_DB)
 			budget = movie_db.get_budget(movie)
 
 			if budget is None:

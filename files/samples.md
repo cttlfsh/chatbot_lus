@@ -18,7 +18,7 @@
 * director_name{"movie_name": "I am Sam"}
     - slot{"movie.name": "I am Sam"}
     - action_director
-    - slot{"Director.name": "Jessie Nelson"}
+    - slot{"director.name": "Jessie Nelson"}
 * goodbye
     - utter_goodbye
 

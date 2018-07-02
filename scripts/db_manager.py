@@ -2,26 +2,34 @@ from sqlalchemy import and_
 from difflib import get_close_matches
 
 import sqlsoup
+import mysql.connector
 
 
 
 class DBManager:
-	def __init__(self, uri):
-		self.db = sqlsoup.SQLSoup(uri)
-		self.movie = self.db.movie
+	def __init__(self):
+		self.db = mysql.connector.connect(user='lus', password='lus',
+                              host='127.0.0.1')
+		self.cursor = self.db.cursor()
+		#self.movie = self.db.movie
 		### self.movies = self.db.movies
-		
 
 	### Using **kwargs means passing lists
 	def filter(self, **kwargs):
 		found = False
-		result = and_()
+		titles = []
+		#result = and_()
 		for key in kwargs:
 			val = kwargs[key]
-
 			### dont know what to put inside ilike
 			if key == "title":
-				result = and_(result, self.movie.title.ilike("%" + val + "%"))
+				int i = 0
+				query = ("SELECT title FROM movie WHERE title LIKE " + val)
+				self.cursor.execute(query, ("%" + val + "%",))
+				for title in cursor:
+					titles[i] = title
+					#print("titles".format(title))
+				#result = and_(result, self.movie.title.ilike("%" + val + "%"))
 				if not found:
 					found = True
 			elif key =="actor":
@@ -29,7 +37,12 @@ class DBManager:
 				if not found:
 					found = True
 			elif key =="director":
-				result = and_(result, self.movie.director.ilike("%" + val + "%"))
+				int i = 0
+				query = ("SELECT director FROM movie WHERE title LIKE " + val)
+				self.cursor.execute(query, ("%" + val + "%",))
+				for title in cursor:
+					titles[i] = title
+				#result = and_(result, self.movie.director.ilike("%" + val + "%"))
 				if not found:
 					found = True
 			elif key =="genre":
@@ -76,7 +89,7 @@ class DBManager:
 	def get_movie(self, **kwargs):
 		query = self.filter(**kwargs)
 		if (query is not None):
-			return self.movie.filter(select).all()
+			return self.movie.filter(query).all()
 		else:
 			return None
 
@@ -96,7 +109,6 @@ class DBManager:
 		### position ==> check[0]
 		if len(check) > 0:
 			return matches_list(check[0])
-
 		return None
 
 

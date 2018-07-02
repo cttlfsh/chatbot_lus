@@ -1,7 +1,7 @@
-from data_processing import intent_processing
-from db_manager import DBManager
+# from data_processing import intent_processing
+# from db_manager import DBManager
 
-moviedb = DBManager("mysql://lus:lus@localhost:3306/moviedb")
+# moviedb = DBManager("mysql://lus:lus@localhost:3306/moviedb")
 
 # lab_list = []
 # entity_list =[]
@@ -32,3 +32,22 @@ moviedb = DBManager("mysql://lus:lus@localhost:3306/moviedb")
 # with open("../files/entities.txt", "w") as f:
 # 	for line in entity_list:
 # 		f.write(str(line) + "\n")
+
+
+
+import mysql.connector
+
+cnx = mysql.connector.connect(user='lus', password='lus',
+                              host='127.0.0.1',
+                              database='moviedb')
+cursor = cnx.cursor()
+val = "USA"
+query = ("SELECT title FROM movie WHERE country LIKE %s")
+
+cursor.execute(query, ("%" + val + "%",))
+
+for title in cursor:
+	print("title is {}".format(title))
+
+cursor.close()
+cnx.close()
