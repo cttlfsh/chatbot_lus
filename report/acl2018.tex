@@ -160,10 +160,10 @@ The bot is implemented in \textit{bot.py} and its structure is very simple, it l
 		\item {\bfseries train-dialogue}
 		
 			After training the NLU, it is ready for the question/answer phase, but it does not know how to handle the conversation. For this purpose, a dialogue manager (DM) is trained passing as input the NLU previously created, the policies (Keras and Memoization in this case). the DM is trained over a data file, here identified as \textit{stories.md}, which contains examples of conversation in order to help to understand the flow.
-			There is also the passobility of an "online\_training", that is exactly the one previously referenced as \textit{interactive learning} when describing Rasa. In this way, it is possible to train the agent step by step, immediately correcting its answers when wrong.
+			There is also the possibility of an "online\_training", that is exactly the one previously referenced as \textit{interactive learning} when describing Rasa. In this way, it is possible to train the agent step by step, immediately correcting its answers when wrong.
 		\item {\bfseries run}
 	
-			Standard way to run the bot, once both training are done.
+			Standard way to run the bot, once both training steps are done.
 	\end{itemize}
 
 \section{Training and evaluation}
@@ -175,25 +175,29 @@ NLU has been trained using Rasa standard evaluation method (\textit{python -m ra
 	\center\caption{Results of evaluation of the NLU}
 \end{figure}
 
-When running the second step, though, I faced an big issue. Whenever I tried to access the database I got the following error:
+
+
+The dialogue manager has been trained mainly through with the online training method, a particular procedure where the bot runs in a debug-like fashion. Here it is possible to correct bot's actions step by step creating stories from which it will learn. The structure of this procedure is shown in Figure \ref{fig:hist}.
 
 \begin{figure}[h]
-	\includegraphics[scale=.55]{images/error}
+	\centering
+	\includegraphics[width=.5\textwidth]{images/history}
+	\caption{Interactive/online training}
+	\label{fig:hist}
 \end{figure}
 
-This error is shown because a \textit{MySQLdb} module is missing. As a consequence I can not access the database from Python, meaning I am not able to retrieve any information from it. I tried to solve this problem in many ways, from the less destructive ones (\textit{e.g.} try to reinstall pip) to the more destructive ones (\textit{e.g.} install via sudo pip, delete and reinstall Python) but none of these have worked. 
-
-For this reason, I can not train the dialogue manager neither with the supervised training nor with the online, interactive learning. I am currently searching a way to solve it, in order to do  , even if very late.
+The bot is able to answer in a quite good way to almost all simple questions based on a movie title. Director's information, actor's list, release year or country, budget, gross and also the rating of the requested movie on IMDB.
 
 \begin{figure}[h]
 	\center\includegraphics[scale=.5]{images/results}
 	\center\caption{Classification report of NLU training with Rasa}
 \end{figure}
 
-\section{Conclusions}
+\section{Conclusions and Future Work}
 
-In this project a chat-bot implementation within Rasa framework is shown, even if with some limitations. It is possible indeed to train the NLU with satisfactory results (above $90\%$ of F1) as shown above, but it is not possible to train the dialogue manager due to an error I am not able to solve.\\
+In this project a very simple implementation of a chat-bot within Rasa framework is shown, even if with some limitations. It is possible indeed to train the NLU with satisfactory results (above $90\%$ of F1) as shown above and also to train the dialogue manager both with the online and the supervised training.\\
 
-Even though, the pipeline of the implementation follows the one provided in the example in the GitHub repository with some insight from the official documentation of Rasa, the error is just a matter of the machine, which for some reason refuses to install some modules.
+The pipeline follows the implementation provided in the example in the Rasa GitHub repository with some insight from the official documentation.
 
+I personally really liked this topic, in particular related with the movie domain. For this reason, I think that one of the future improvements this bot will have is use Rasa custom policies to model more complex queries, like "Group me all movies with actor X" or "Tell me how many times actor X is involved in a Thriller movie". Moreover I would also like to connect it to chatting platform like telegram in order to have it mobile for any need.
 \end{document}

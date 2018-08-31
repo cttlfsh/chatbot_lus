@@ -18,6 +18,11 @@
     "utter_goodbye": {
       "slots": []
     }, 
+    "action_year": {
+      "slots": [
+        "movie.release_date"
+      ]
+    }, 
     "action_country": {
       "slots": [
         "movie.location"
@@ -33,11 +38,6 @@
         "movie.genre"
       ]
     }, 
-    "action_gross": {
-      "slots": [
-        "movie.gross_revenue"
-      ]
-    }, 
     "action_language": {
       "slots": [
         "movie.language"
@@ -49,9 +49,9 @@
         "movie.gross_revenue"
       ]
     }, 
-    "action_year": {
+    "action_gross": {
       "slots": [
-        "movie.release_date"
+        "movie.gross_revenue"
       ]
     }
   }, 
