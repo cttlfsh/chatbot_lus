@@ -1,7 +1,6 @@
 from sqlalchemy import and_
 from difflib import get_close_matches
 
-import sqlsoup
 import mysql.connector
 
 
@@ -11,76 +10,89 @@ class DBManager:
 		self.db = mysql.connector.connect(user='lus', password='lus',
                               host='127.0.0.1')
 		self.cursor = self.db.cursor()
-		#self.movie = self.db.movie
-		### self.movies = self.db.movies
 
 	### Using **kwargs means passing lists
 	def filter(self, **kwargs):
 		found = False
 		titles = []
-		#result = and_()
 		for key in kwargs:
 			val = kwargs[key]
-			### dont know what to put inside ilike
 			if key == "title":
+				
 				int i = 0
 				query = ("SELECT title FROM movie WHERE title LIKE " + val)
 				self.cursor.execute(query, ("%" + val + "%",))
 				for title in cursor:
 					titles[i] = title
 					#print("titles".format(title))
-				#result = and_(result, self.movie.title.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif key =="actor":
-				result = and_(result, self.movie.actor.ilike("%" + val + "%"))
+				int i = 0
+				query = ("SELECT title FROM movie WHERE title LIKE " + val)
+				self.cursor.execute(query, ("%" + val + "%",))
+				for title in cursor:
+					titles[i] = title
+					#print("titles".format(title))
 				if not found:
 					found = True
+
 			elif key =="director":
 				int i = 0
 				query = ("SELECT director FROM movie WHERE title LIKE " + val)
 				self.cursor.execute(query, ("%" + val + "%",))
 				for title in cursor:
 					titles[i] = title
-				#result = and_(result, self.movie.director.ilike("%" + val + "%"))
+					i = i+1
 				if not found:
 					found = True
+
 			elif key =="genre":
 				result = and_(result, self.movie.genre.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif (key =="country"):
 				result = and_(result, self.movie.country.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif (key =="yar"):
 				result = and_(result, self.movie.year.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif (key =="language" ):
 				result = and_(result, self.movie.language.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif key =="runtime":
 				result = and_(result, self.movie.duration.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif key =="color":
 				result = and_(result, self.movie.color.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif key == "budget":
 				result = and_(result, self.movie.budget.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif key =="score":
 				result = and_(result, self.movie.imdb_score.ilike("%" + val + "%"))
 				if not found:
 					found = True
+
 			elif key =="likes":
 				result = and_(result, self.movie.imdb_score.ilike("%" + val + "%"))
 				if not found:
 					found = True
+					
 		if found:
 			return result
 		return None

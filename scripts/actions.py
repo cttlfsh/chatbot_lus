@@ -9,6 +9,8 @@ import random
 # from policy import RestaurantPolicy, ScriptedPolicy
 from rasa_core import utils
 from rasa_core.actions import Action
+from rasa_core.actions.forms import FormAction
+from rasa_core.actions.forms import EntityFormField
 from rasa_core.agent import Agent
 from rasa_core.channels import HttpInputChannel
 from rasa_core.channels.console import ConsoleInputChannel
@@ -17,17 +19,15 @@ from rasa_core.events import SlotSet, AllSlotsReset, Restarted
 from rasa_core.interpreter import RasaNLUInterpreter, RegexInterpreter
 from rasa_core.policies.memoization import MemoizationPolicy
 
-from db_manager import DBManager
+from new_db_manager import DBManager
 
 
-slots = ["movie.name", "movie.genre", "movie.country", 
+slots = ["movie.name", "movie.genre", "movie.location", 
 			"movie.year", "movie.language", "actor.name",
 			"director.name", "movie.budget", "movie.duration",
-			"language", "color", "country", "year", "plot_keywords",
-			"score", "likes"
+			"language", "color", "movie.release_date", "movie.plot_keywords",
+			"movie.star_rating", "movie.likes", "movie.gross_revenue"
 		]
-
-LINK_TO_DB = "mysql://lus:lus@localhost:3306/moviedb"
 
 def error_messages():
 	messages = [
@@ -56,51 +56,94 @@ class ActionAllSlotReset(Action):
 
 #### CUSTOM CLASSES
 
-class ActionMovie(Action):
+# #Deprecated
+# class ActionMovie(FormAction):
+
+# 	# @staticmethod
+# 	# def required_fields():
+# 	# 	return[EntityFormField("movie.name", "movie.name"),
+#  #    	EntityFormField("movie.name", "movie.choice")]
+
+
+# 	def name(self):
+# 		return "action_movie"
+
+# 	def run(self, dispatcher, tracker, domain):
+# 		movie_list = []
+# 		butt_dict_key = {}
+# 		buttons = []
+
+# 		movie = tracker.get_slot("movie.name")
+
+# 		if movie is None:
+# 			dispatcher.utter_message(error_messages())
+# 			dispatcher.utter_template("utter_repeat")
+# 		else:
+# 			movie_db = DBManager()
+# 			movie_list = movie_db.get_movie(movie)
+# 			#print(type(movie_list[0]) + " <-- TIPO ELEMENTO")
+# 			#print(movie_list)
+# 			if movie_list is None:
+# 				dispatcher.utter_template("utter_say_noresults")
+# 			elif len(movie_list) > 1:
+# 				for el in movie_list:
+# 					butt_dict_key["title"] = el.decode('utf8')
+# 					butt_dict_key["payload"] = el.decode('utf8')
+# 					buttons.append(butt_dict_key.copy())
+# 				dispatcher.utter_button_message("I found these results, which one do you prefer?\n", buttons)
+# 				#choice = movie_db.check_list(movie_list)
+# 				return[SlotSet("movie.list", buttons)]
+# 			else:
+# 				choice = movie_list[0].decode('utf8')
+# 				dispatcher.utter_message("I found this result: " + choice + " is it correct?\n")
+# 				return[SlotSet("movie.name", choice)]
+
+# 			return[]
+# #Deprecated
+# class ActionChoice(FormAction):
+
+# 	def name(self):
+# 		return "action_choice"
+
+# 	def run(self, dispatcher, tracker, domain):
+# 		movie_list = []
+# 		butt_dict_key = {}
+# 		buttons = []
+
+# 		movie = tracker.get_slot("movie.name")
+# 		c = tracker.get_slot("movie.choice")
+# 		listM = tracker.get_slot("movie.list")
+
+# 		dispatcher.utter_message("So you mean" + listM[int(movie)][1])
+# 		if c is not None:
+# 			return[SlotSet("movie.name", listM[int(movie)][1])]
+
+class ActionActors(Action):
 	def name(self):
-		return "action_movie"
+		return "action_actors"
 
 	def run(self, dispatcher, tracker, domain):
-		dispatcher.utter_message("Catchphrase. Searching...")
-
-		dic = {}
-		for s in slots:
-			dic[s] = tracker.get_slot(s)
-
-		movie_db = DBManager(LINK_TO_DB)
-		res = movie_db.get_title(**dic)
-
-		if dic is None:
-			dispatcher.utter_message("My database does not contain the movie you are searching")
-		else:
-			dispatcher.utter_message("Got you! The search gave this output: " + res[0])
-
-		return [SlotSet("movie.name", res[0])]
-
-
-class ActionActor(Action):
-	def name(self):
-		return "action_actor"
-
-	def run(self, dispatcher, tracker, domain):
+		result = []
+		actors = []
+		butt_dict_key = {}
+		buttons = []
 		movie = tracker.get_slot("movie.name")
 		if movie is None:
 			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
 		else:
-			movie_db = DBManager(LINK_TO_DB)
-			act_list = movie_db.get_actor(movie)
-
-			if act_list is None:
+			movie_db = DBManager()
+			result = movie_db.get_actors(movie)
+			if actors is None:
 				dispatcher.utter_message(error_messages())
 			else:
-				### if there is more than 1 actor, keep the first
-				### one, that is the main actor
-				if "|" in act_list:
-					a = act_list.split("|")[0]
-				else: 
-					a = act_list
-				dispatcher.utter_message("Actor name for " + movie + " is " + a)
-				return [SlotSet("actor.name", a)]
+				actors = result[1].split("|")
+				for el in actors:
+					butt_dict_key["title"] = ""
+					butt_dict_key["payload"] = el
+					buttons.append(butt_dict_key.copy())
+				dispatcher.utter_button_message("Actors for " + result[0] + " are: ", buttons)
+				return[SlotSet("actor.name", actors)]
 
 
 class ActionDirector(Action):
@@ -108,73 +151,213 @@ class ActionDirector(Action):
 		return "action_director"
 
 	def run(self, dispatcher, tracker, domain):
+		director = []
 		movie = tracker.get_slot("movie.name")
 		if movie is None:
 			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
 		else:
 			movie_db = DBManager()
-			movie_db.get_director(movie)
-
-			if director is None:
+			director = movie_db.get_director(movie)
+			if director[1] is None:
 				dispatcher.utter_message(error_messages())
 			else:
-				dispatcher.utter_message("Director of the movie " + movie + " is " + director)
-				return[SlotSet("director.name", director)]
+				#dispatcher.utter_message("Movie " + movie_result)
+				dispatcher.utter_message("The director of " + director[0] + " is: " + director[1])
+				return[SlotSet("director.name", director[1])]
 
-class ActionGenre(Action):
+class ActionBudget(Action):
 	def name(self):
-		return "action_genre"
+		return "action_budget"
 
 	def run(self, dispatcher, tracker, domain):
+		result = []
 		movie = tracker.get_slot("movie.name")
 		if movie is None:
 			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
 		else:
-			movie_db = DBManager(LINK_TO_DB)
-			genre_list = movie_db.get_genre(movie)
-
-			if genre_list is None:
+			movie_db = DBManager()
+			result = movie_db.get_budget(movie)
+			if result[1] is None:
 				dispatcher.utter_message(error_messages())
 			else:
-				genre = genre_list.split("|")[0]
-				dispatcher.utter_message("Main genre for " + movie + " is: " + genre)
-				return(SlotSet("movie.genre", genre))
-
-class ActionCountry(Action):
-	def name(self):
-		return "action_country"
-
-	def run(self, dispatcher, tracker, domain):
-		movie = tracker.get_slot("movie.name")
-		if movie is None:
-			dispatcher.utter_message(error_messages())
-		else:
-			movie_db = DBManager(LINK_TO_DB)
-			country = movie_db.get_country(movie)
-
-			if country is None:
-				dispatcher.utter_message(error_messages())
-			else:
-				dispatcher.utter_message("The film was made in:" + country)
-				return [SlotSet("movie.release_region", country), SlotSet("country.name", country), SlotSet("movie.location", country)]
+				#dispatcher.utter_message("Movie " + movie_result)
+				dispatcher.utter_message(result[0] + " had a budget of: " + str(result[1]))
+				return[SlotSet("movie.budget", result[1])]
 
 class ActionYear(Action):
 	def name(self):
 		return "action_year"
 
 	def run(self, dispatcher, tracker, domain):
+		result = []
 		movie = tracker.get_slot("movie.name")
 		if movie is None:
 			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
 		else:
-			movie_db = DBManager(LINK_TO_DB)
-			year = movie_db.get_year(movie)
-
-			if year is None:
+			movie_db = DBManager()
+			result = movie_db.get_year(movie)
+			if result[1] is None:
 				dispatcher.utter_message(error_messages())
 			else:
-				dispatcher.utter_message("The film was made in:" + str(year))
-				return [SlotSet("movie.release_date", str(year))]
+				dispatcher.utter_message("Release year for " + result[0] + " is: " + str(result[1]))
+				return[SlotSet("movie.release_date", result[1])]
+
+class ActionCountry(Action):
+	def name(self):
+		return "action_country"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_country(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				dispatcher.utter_message("Release region for " + result[0] + " is: " + result[1])
+				return[SlotSet("movie.location", result[1])]
+
+class ActionGross(Action):
+	def name(self):
+		return "action_gross"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_gross(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				#dispatcher.utter_message("Movie " + movie_result)
+				dispatcher.utter_message("Gross revenue of " + result[0] + " is: " + str(result[1]))
+				return[SlotSet("movie.gross_revenue", result[1])]
+
+class ActionScore(Action):
+	def name(self):
+		return "action_score"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_score(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				#dispatcher.utter_message("Movie " + choice)
+				dispatcher.utter_message("IMDB score of " + result[0] + " is: " + str(result[1]))
+				return[SlotSet("movie.star_rating", result[1])]
+
+
+class ActionLikes(Action):
+	def name(self):
+		return "action_likes"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_likes(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				#dispatcher.utter_message("Movie " + choice)
+				dispatcher.utter_message(result[0] + " has " + str(result[1]) + " Facebook likes")
+				return[SlotSet("movie.likes", result[1])]
+
+class ActionLink(Action):
+	def name(self):
+		return "action_link"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_link(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				#dispatcher.utter_message("Movie " + choice)
+				dispatcher.utter_message(result[0] + " has " + str(result[1]) + " Facebook likes")
+				return[SlotSet("movie.imdb_link", result[1])]
+
+class ActionGenres(Action):
+	def name(self):
+		return "action_genres"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		genres = []
+		butt_dict_key = {}
+		buttons = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_genres(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				genres = result[1].split("|")
+				for el in genres:
+					butt_dict_key["title"] = ""
+					butt_dict_key["payload"] = el
+					buttons.append(butt_dict_key.copy())
+				dispatcher.utter_button_message("Genres for " + result[0] + " are: ", buttons)
+				return[SlotSet("movie.genre", genres)]
+
+class ActionKeywords(Action):
+	def name(self):
+		return "action_keywords"
+
+	def run(self, dispatcher, tracker, domain):
+		result = []
+		keywords = []
+		butt_dict_key = {}
+		buttons = []
+		movie = tracker.get_slot("movie.name")
+		if movie is None:
+			dispatcher.utter_message(error_messages())
+			dispatcher.utter_template("utter_repeat")
+		else:
+			movie_db = DBManager()
+			result = movie_db.get_keywords(movie)
+			if result[1] is None:
+				dispatcher.utter_message(error_messages())
+			else:
+				keywords = result[1].split("|")
+				for el in keywords:
+					butt_dict_key["title"] = ""
+					butt_dict_key["payload"] = el
+					buttons.append(butt_dict_key.copy())
+				dispatcher.utter_button_message("Plot keywords for " + result[0] + " are: ", buttons)
+				return[SlotSet("movie.plot_keywords", genres)]
 
 
 class ActionLanguage(Action):
@@ -182,103 +365,33 @@ class ActionLanguage(Action):
 		return "action_language"
 
 	def run(self, dispatcher, tracker, domain):
+		result = []
 		movie = tracker.get_slot("movie.name")
 		if movie is None:
 			dispatcher.utter_message(error_messages())
 		else:
-			movie_db = DBManager(LINK_TO_DB)
-			language = movie_db.get_language(movie)
-
-			if language is None:
+			movie_db = DBManager()
+			result = movie_db.get_language(movie)
+			if result[1] is None:
 				dispatcher.utter_message(error_messages())
 			else:
-				dispatcher.utter_message("Language of " + movie + " is: " + language)
-				return [SlotSet("movie.language", language), SlotSet("language", language)]
+				dispatcher.utter_message("Language of " + result[0] + " is: " + result[1])
+				return [SlotSet("movie.language", result[1])]
 
 class ActionDuration(Action):
 	def name(self):
 		return "action_duration"
 
 	def run(self, dispatcher, tracker, domain):
+		result = []
 		movie = tracker.get_slot("movie.name")
 		if movie is None:
 			dispatcher.utter_message(error_messages())
 		else:
-			movie_db = DBManager(LINK_TO_DB)
-			duration = movie_db.get_duration(movie)
-
-			if language is None:
+			movie_db = DBManager()
+			result[1] = movie_db.get_duration(movie)
+			if result[1] is None:
 				dispatcher.utter_message(error_messages())
 			else:
-				dispatcher.utter_message("The film lasts:" + duration)
-				return [SlotSet("movie.duration", duration)]
-
-class ActionBudget(Action):
-	def name(self):
-		return "action_budget"
-
-	def run(self, dispatcher, tracker, domain):
-		movie = tracker.get_slot("movie.name")
-		if movie is None:
-			dispatcher.utter_message(error_messages())
-		else:
-			#movie_db = DBManager(LINK_TO_DB)
-			budget = movie_db.get_budget(movie)
-
-			if budget is None:
-				dispatcher.utter_message(error_messages())
-			else:
-				dispatcher.utter_message("The film had a budget of: " + budget + " mln")
-				return [SlotSet("movie.budget", budget)]
-
-class ActionScore(Action):
-	def name(self):
-		return "action_score"
-
-	def run(self, dispatcher, tracker, domain):
-		movie = tracker.get_slot("movie.name")
-		if movie is None:
-			dispatcher.utter_message(error_messages())
-		else:
-			movie_db = DBManager(LINK_TO_DB)
-			rating = movie_db.get_score(movie)
-
-			if rating is None:
-				dispatcher.utter_message(error_messages())
-			else:
-				return [SlotSet("score", rating)]
-
-class ActionLike(Action):
-	def name(self):
-		return "action_likes"
-
-	def run(self, dispatcher, tracker, domain):
-		movie = tracker.get_slot("movie.name")
-		if movie is None:
-			dispatcher.utter_message(error_messages())
-		else:
-			movie_db = DBManager(LINK_TO_DB)
-			likes = movie_db.get_likes(movie)
-
-			if likes is None:
-				dispatcher.utter_message(error_messages())
-			else:
-				return [SlotSet("likes", likes)]
-
-class ActionGross(Action):
-	def name(self):
-		return "action_gross"
-
-	def run(self, dispatcher, tracker, domain):
-		movie = tracker.get_slot("movie.name")
-		if movie is None:
-			dispatcher.utter_message(error_messages())
-		else:
-			movie_db = DBManager(LINK_TO_DB)
-			gross = movie_db.get_gross(movie)
-
-			if gross is None:
-				dispatcher.utter_message(error_messages())
-			else:
-				return [SlotSet("likes", gross)]
-
+				dispatcher.utter_message(result[0] + " lasts:" + result[1])
+				return [SlotSet("movie.duration", result[1])]

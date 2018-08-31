@@ -1,8 +1,8 @@
 {
   "action_fingerprints": {
-    "action_genre": {
+    "action_actors": {
       "slots": [
-        "movie.genre"
+        "actor.name"
       ]
     }, 
     "action_listen": {
@@ -10,9 +10,9 @@
         "movie.name"
       ]
     }, 
-    "action_duration": {
+    "action_director": {
       "slots": [
-        "movie.duration"
+        "director.name"
       ]
     }, 
     "utter_goodbye": {
@@ -20,7 +20,7 @@
     }, 
     "action_country": {
       "slots": [
-        "movie.release_region"
+        "movie.location"
       ]
     }, 
     "action_score": {
@@ -28,9 +28,14 @@
         "movie.star_rating"
       ]
     }, 
-    "action_director": {
+    "action_genres": {
       "slots": [
-        "director.name"
+        "movie.genre"
+      ]
+    }, 
+    "action_gross": {
+      "slots": [
+        "movie.gross_revenue"
       ]
     }, 
     "action_language": {
@@ -38,19 +43,15 @@
         "movie.language"
       ]
     }, 
-    "action_actor": {
-      "slots": [
-        "actor.name"
-      ]
-    }, 
     "action_budget": {
       "slots": [
-        "movie.budget"
+        "movie.budget", 
+        "movie.gross_revenue"
       ]
     }, 
     "action_year": {
       "slots": [
-        "movie.duration"
+        "movie.release_date"
       ]
     }
   }, 

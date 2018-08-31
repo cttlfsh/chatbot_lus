@@ -6,22 +6,22 @@ action_names:
 - utter_ack_dosearch
 - utter_ack_findalternatives
 - utter_ask_howcanhelp
-- utter_ask_morethanone
+- utter_say_noresults
 - utter_ask_moreupdates
 - utter_ask_cantdoit
-- action_restarted
-- action_slot_reset
-- action_movie
-- action_actor
+- utter_repeat
 - action_director
-- action_genre
-- action_country
 - action_year
-- action_language
-- action_duration
+- action_country
 - action_budget
+- action_gross
 - action_score
+- action_actors
+- action_genres
 - action_likes
+- action_link
+- action_duration
+- action_language
 actions:
 - utter_greet
 - utter_goodbye
@@ -29,22 +29,22 @@ actions:
 - utter_ack_dosearch
 - utter_ack_findalternatives
 - utter_ask_howcanhelp
-- utter_ask_morethanone
+- utter_say_noresults
 - utter_ask_moreupdates
 - utter_ask_cantdoit
-- actions.ActionRestarted
-- actions.ActionAllSlotReset
-- actions.ActionMovie
-- actions.ActionActor
+- utter_repeat
 - actions.ActionDirector
-- actions.ActionGenre
-- actions.ActionCountry
 - actions.ActionYear
-- actions.ActionLanguage
-- actions.ActionDuration
+- actions.ActionCountry
 - actions.ActionBudget
+- actions.ActionGross
 - actions.ActionScore
-- actions.ActionLike
+- actions.ActionActors
+- actions.ActionGenres
+- actions.ActionLikes
+- actions.ActionLink
+- actions.ActionDuration
+- actions.ActionLanguage
 config:
   store_entities_as_slots: true
 entities:
@@ -59,49 +59,36 @@ entities:
 - movie.release_date
 - movie.release_region
 - movie.star_rating
+- movie.likes
+- movie.duration
+- movie.imdb_link
+- movie.plot_keywords
 intents:
+- other
 - greet
-- affirm
-- deny
-- inform
 - goodbye
 - thankyou
-- request_info
 - actor_name
 - budget
 - country
 - director_name
 - genre
 - language
-- movie
-- movie_&&_rating
-- movie_count
-- movie_name
 - rating
 - release_date
 - runtime
 - star_rating
+- gross_revenue
+- facebook_likes
+- imdb_link
+- plot_keywords
 slots:
   actor.name:
     initial_value: null
-    type: rasa_core.slots.TextSlot
-  color:
-    initial_value: null
-    type: rasa_core.slots.BooleanSlot
-  country.name:
-    initial_value: null
-    type: rasa_core.slots.TextSlot
+    type: rasa_core.slots.ListSlot
   director.name:
     initial_value: null
     type: rasa_core.slots.TextSlot
-  language:
-    initial_value: null
-    type: rasa_core.slots.TextSlot
-  likes:
-    initial_value: null
-    max_value: 1.0
-    min_value: 0.0
-    type: rasa_core.slots.FloatSlot
   movie.budget:
     initial_value: null
     max_value: 1.0
@@ -112,21 +99,32 @@ slots:
     type: rasa_core.slots.TextSlot
   movie.genre:
     initial_value: null
-    type: rasa_core.slots.TextSlot
+    type: rasa_core.slots.ListSlot
   movie.gross_revenue:
     initial_value: null
     max_value: 1.0
     min_value: 0.0
     type: rasa_core.slots.FloatSlot
+  movie.imdb_link:
+    initial_value: null
+    type: rasa_core.slots.TextSlot
   movie.language:
     initial_value: null
     type: rasa_core.slots.TextSlot
+  movie.likes:
+    initial_value: null
+    max_value: 1.0
+    min_value: 0.0
+    type: rasa_core.slots.FloatSlot
   movie.location:
     initial_value: null
     type: rasa_core.slots.TextSlot
   movie.name:
     initial_value: null
     type: rasa_core.slots.TextSlot
+  movie.plot_keywords:
+    initial_value: null
+    type: rasa_core.slots.ListSlot
   movie.release_date:
     initial_value: null
     max_value: 1.0
@@ -140,9 +138,6 @@ slots:
     max_value: 1.0
     min_value: 0.0
     type: rasa_core.slots.FloatSlot
-  plot_keywords:
-    initial_value: null
-    type: rasa_core.slots.ListSlot
 templates:
   utter_ack_dosearch:
   - text: Request sheduled, let me check my slots
@@ -153,10 +148,10 @@ templates:
   utter_ask_howcanhelp:
   - text: how can I help you?
   - text: May I be of some help?
-  utter_ask_morethanone:
-  - text: My search highlighted more than one result, which one do you prefer?
   utter_ask_moreupdates:
   - text: May I provide you more information?
+  utter_ask_movie.choice:
+  - text: Which one?
   utter_default:
   - text: default message
   utter_goodbye:
@@ -164,4 +159,9 @@ templates:
   - text: May you have a pleasent day, farewell!
   utter_greet:
   - text: Good Morning Sir/Miss
+  utter_repeat:
+  - text: ' Can you repeat the question?'
+  utter_say_noresults:
+  - text: My search did not highlighted any result, could you repeat me the question
+      pelase?
 topics: []

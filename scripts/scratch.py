@@ -1,53 +1,54 @@
-# from data_processing import intent_processing
-# from db_manager import DBManager
-
-# moviedb = DBManager("mysql://lus:lus@localhost:3306/moviedb")
-
-# lab_list = []
-# entity_list =[]
-
-# with open("../intents_db/NLSPARQL.train.utt.labels.txt", "r") as f:
-# 	for line in f:
-# 		lab_list.append(line[:-1])
-
-# unique_lab = set(lab_list)
-# lab_list = list(unique_lab)
-# #print(lab_list)
-# lab_list.sort()
-
-# # with open("../files/train_labels.txt", "w") as f:
-# # 	for line in lab_list:
-# # 		proc_line = intent_processing(line)
-# # 		f.write(proc_line + "\n")
-
-# with open("../intents_db/NLSPARQL.train.data", "r") as f:
-# 	for line in f.readlines():
-# 		if line != "\n":
-# 			entity_list.append(line.split("\t")[1][2:-1])
-
-# unique_ent = set(entity_list)
-# entity_list = list(unique_ent)
-# entity_list.sort()
-
-# with open("../files/entities.txt", "w") as f:
-# 	for line in entity_list:
-# 		f.write(str(line) + "\n")
-
-
-
 import mysql.connector
+
+from new_db_manager import DBManager
+
+# def get_movie():
+
+
+# def check_list(listC):
+# 	for i, el in enumerate(listC):
+# 		print(str(i) + ". " + el)
+# 	title = raw_input("Which one do you mean? (Select the number) ")
+# 	return title
+
+def get_director(movie, cursor):
+	listT = []
+	movieQ = ("SELECT title FROM movie WHERE title LIKE %s")
+	cursor.execute(movieQ, ("%" + movie + "%",))
+	for t in cursor:
+		listT.append(t[0])
+		#print(type(t))
+	# if len(listT) > 1:
+	# 	ind = check_list(listT)
+	# else:
+	# 	ind = 0
+	return listT
+
+	# query = ("SELECT director FROM movie WHERE title LIKE %s")
+	# cursor.execute(query, ("%" + listT[int(ind)] + "%",))
+	# for t in cursor:
+	# 	director.append(t[0].decode("utf-8"))
+	# return director[0]
+
 
 cnx = mysql.connector.connect(user='lus', password='lus',
                               host='127.0.0.1',
                               database='moviedb')
+director = []
 cursor = cnx.cursor()
-val = "USA"
-query = ("SELECT title FROM movie WHERE country LIKE %s")
 
-cursor.execute(query, ("%" + val + "%",))
-
-for title in cursor:
-	print("title is {}".format(title))
+inpt = raw_input("Ask me something: ")
+director = get_director(inpt, cursor)
+print (director)
 
 cursor.close()
 cnx.close()
+
+
+
+
+# db = DBManager()
+
+# inpt = raw_input("Ask me something: ")
+# dirw = db.get_director(inpt)
+# print(dirw)

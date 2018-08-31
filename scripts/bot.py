@@ -10,6 +10,7 @@ from rasa_core.events import SlotSet
 from rasa_nlu.training_data import load_data
 from rasa_nlu import config
 from rasa_nlu.model import Trainer
+from rasa_core.channels.telegram import TelegramInput
 from rasa_core.channels import HttpInputChannel
 from rasa_core.channels.console import ConsoleInputChannel
 from rasa_core.policies.memoization import MemoizationPolicy
@@ -29,7 +30,7 @@ MODEL_DIR = "../models"
 MODEL_DIALOGUE = "../models/dialogue"
 CHAT = "../models/default/chat"
 
-STORIES = "../files/samples.md"
+STORIES = "stories.md"
 
 
 def train_nlu():
@@ -37,6 +38,7 @@ def train_nlu():
     trainer = Trainer(config.load(CONFIG_NLU))
     trainer.train(training_data)
     model_directory = trainer.persist(MODEL_DIR, fixed_model_name = 'chat')
+    return model_directory
 
 def train_dialogue():
     interpreter = RasaNLUInterpreter(CHAT)
@@ -45,24 +47,30 @@ def train_dialogue():
     training_data = STORIES ###TODO
     agent.train(
             training_data,
-            epochs=400,
+            epochs=500,
             batch_size=100,
-            validation_split=0.2
+            validation_split=0.3
     )
     agent.persist(MODEL_DIALOGUE)
+
+    # input_channel = TelegramInput(
+    #     access_token="577522303:AAG6_5NcdBVRq-ndzThybnOh7SHL9I2ylKo", # you get this when setting up a bot
+    #     verify="chatmoviedomainbot", # this is your bots username
+    #     webhook_url="https://07958fff.ngrok.io" # the url your bot should listen for messages
+    # )
 
     input_channel = ConsoleInputChannel()
     agent.train_online(
                 training_data,
                 input_channel=input_channel,
-                epochs=100,
+                epochs=400,
                 batch_size=100
         )
     
     return agent
 
 def run(serve_forever=True):
-    interpreter = RasaNLUInterpreter(MODEL_DIR)
+    interpreter = RasaNLUInterpreter(CHAT)
     agent = Agent.load(MODEL_DIALOGUE, interpreter=interpreter)
 
     if serve_forever:
