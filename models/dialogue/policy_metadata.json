@@ -5,9 +5,9 @@
         "actor.name"
       ]
     }, 
-    "action_listen": {
+    "action_year": {
       "slots": [
-        "movie.name"
+        "movie.release_date"
       ]
     }, 
     "action_director": {
@@ -15,13 +15,13 @@
         "director.name"
       ]
     }, 
+    "action_listen": {
+      "slots": [
+        "movie.name"
+      ]
+    }, 
     "utter_goodbye": {
       "slots": []
-    }, 
-    "action_year": {
-      "slots": [
-        "movie.release_date"
-      ]
     }, 
     "action_country": {
       "slots": [
@@ -33,14 +33,14 @@
         "movie.star_rating"
       ]
     }, 
-    "action_genres": {
-      "slots": [
-        "movie.genre"
-      ]
-    }, 
     "action_language": {
       "slots": [
         "movie.language"
+      ]
+    }, 
+    "action_genres": {
+      "slots": [
+        "movie.genre"
       ]
     }, 
     "action_budget": {
