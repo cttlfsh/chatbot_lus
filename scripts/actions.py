@@ -159,7 +159,9 @@ class ActionDirector(Action):
 		else:
 			movie_db = DBManager()
 			director = movie_db.get_director(movie)
-			if director[1] is None:
+			if director[0] is 'None':
+				dispatcher.utter_message("Requested movie not found.")
+			elif director[1] is None:
 				dispatcher.utter_message(error_messages())
 			else:
 				#dispatcher.utter_message("Movie " + movie_result)

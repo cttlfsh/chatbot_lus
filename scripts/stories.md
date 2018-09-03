@@ -83,7 +83,7 @@
     - utter_goodbye
     - export
 
-## Generated Story 5
+## Generated Story 6
 * greet
     - utter_greet
     - utter_ask_howcanhelp
@@ -522,7 +522,7 @@
     - utter_goodbye
     - export
 
-## Generated Story -2632756971892838053
+## Generated Story 20
 * greet
     - utter_greet
     - utter_ask_howcanhelp
@@ -544,6 +544,71 @@
     - slot{"movie.location": "USA"}
     - utter_ask_moreupdates
 * goodbye
+    - utter_goodbye
+    - export
+
+## Generated Story 111
+* greet
+    - utter_greet
+    - utter_ask_howcanhelp
+* director_name{"movie.name": "indignation"}
+    - slot{"movie.name": "indignation"}
+    - action_director
+    - slot{"director.name": "James Schamus"}
+    - utter_ask_moreupdates
+* goodbye
+    - utter_goodbye
+    - export
+
+## Generated Story 333
+* greet
+    - utter_greet
+    - utter_ask_howcanhelp
+* director_name{"movie.name": "spider-man"}
+    - slot{"movie.name": "spider-man"}
+    - action_director
+    - slot{"director.name": "Sam Raimi"}
+    - utter_ask_moreupdates
+* goodbye
+    - utter_goodbye
+    - export
+
+## Generated Story 888
+* greet
+    - utter_greet
+    - utter_ask_howcanhelp
+* director_name{"movie.name": "the dark knight rises"}
+    - slot{"movie.name": "the dark knight rises"}
+    - action_director
+    - slot{"director.name": "Christopher Nolan"}
+    - utter_ask_moreupdates
+* goodbye
+    - utter_goodbye
+    - export
+
+## Generated Story -1539481125153531528
+* 
+    - utter_greet
+    - utter_ask_howcanhelp
+* director_name{"movie.name": "spider-man"}
+    - slot{"movie.name": "spider-man"}
+    - action_director
+    - slot{"director.name": "Sam Raimi"}
+    - utter_ask_moreupdates
+* goodbye
+    - utter_goodbye
+    - export
+
+## Generated Story 2864590366162716541
+* 
+    - utter_greet
+    - utter_ask_howcanhelp
+* actor_name{"movie.name": "spider-man"}
+    - slot{"movie.name": "spider-man"}
+    - action_actors
+    - slot{"actor.name": ["J.K. Simmons", "James Franco", "Kirsten Dunst"]}
+    - utter_ask_moreupdates
+* movie
     - utter_goodbye
     - export
 
